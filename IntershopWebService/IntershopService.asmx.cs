@@ -1,10 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
-// Type: IntershopWebService
-// Assembly: IntershopWebService, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-// MVID: 6A055958-F609-4E74-9C8B-6034BADC5D94
-// Assembly location: C:\public\Projects\DLLs\Intershop\IntershopWebService.dll
-
-using Microsoft.Dynamics.BusinessConnectorNet;
+﻿using Microsoft.Dynamics.BusinessConnectorNet;
 using System;
 using System.Collections;
 using System.Collections.Generic;
