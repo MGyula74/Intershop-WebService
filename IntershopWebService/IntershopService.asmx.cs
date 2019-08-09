@@ -42,6 +42,7 @@ namespace IntershopWebService
             }
             catch (Exception ex)
             {
+                MessageLogger.info(string.Format("getItemDims(itemId={0}, company={1} -> error: {2})", itemId, company, ex.Message));
                 return (List<IntershopWebService.SizeStock>)null;
             }
             finally
@@ -143,7 +144,12 @@ namespace IntershopWebService
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            MessageLogger.info(string.Format("GetItemsStockSize(count={0}, company={1})", (object)products.Count, (object)company));
+
+            if (products.Count == 1)
+                MessageLogger.info(string.Format("GetItemsStockSize(itemId={0}, company={1})", products[0].itemId, company));
+            else
+                MessageLogger.info(string.Format("GetItemsStockSize(count={0}, company={1})", products.Count, company));
+
             Axapta axapta = (Axapta)null;
             List<IntershopWebService.ProductStock> productStockList = new List<IntershopWebService.ProductStock>();
             try
@@ -175,6 +181,13 @@ namespace IntershopWebService
             }
             catch (Exception ex)
             {
+                if (products.Count == 1)
+                    MessageLogger.info(string.Format("GetItemsPriceSize(itemId={0}, company={1}) -> error: {2}", products[0].itemId, company, ex.Message));
+                else
+                    MessageLogger.info(string.Format("GetItemsPriceSize(count={0}, company={1}) -> error: {2}", products.Count, company, ex.Message));
+
+                MessageLogger.info(string.Format("Stack trace: {0}", ex.StackTrace.ToString()));
+
                 return (List<IntershopWebService.ProductStock>)null;
             }
             finally
@@ -296,11 +309,17 @@ namespace IntershopWebService
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            MessageLogger.info(string.Format("GetItemsPriceSize(count={0}, custaccount={1}, company={2})", (object)products.Count, (object)customerID, (object)company));
-            Axapta ax = this.axLogon(company);
-            List<IntershopWebService.ProductPrice> productPriceList = new List<IntershopWebService.ProductPrice>();
+            Axapta ax = null;
+
+            if (products.Count == 1)
+                MessageLogger.info(string.Format("GetItemsPriceSize(itemId={0}, custaccount={1}, company={2})", products[0].itemId, customerID, company));
+            else
+                MessageLogger.info(string.Format("GetItemsPriceSize(count={0}, custaccount={1}, company={2})", (object)products.Count, (object)customerID, (object)company));
+
             try
             {
+                ax = this.axLogon(company);
+                List<IntershopWebService.ProductPrice> productPriceList = new List<IntershopWebService.ProductPrice>();
                 foreach (IntershopWebService.ProductPriceIn product in products)
                 {
                     IntershopWebService.ProductPriceIn productIn = product;
@@ -337,6 +356,13 @@ namespace IntershopWebService
             }
             catch (Exception ex)
             {
+                if (products.Count == 1)
+                    MessageLogger.info(string.Format("GetItemsPriceSize(itemId={0}, custaccount={1}, company={2}) -> error: {3}", products[0].itemId, customerID, company, ex.Message));
+                else
+                    MessageLogger.info(string.Format("GetItemsPriceSize(count={0}, custaccount={1}, company={2}) -> error: {3}", products.Count, customerID, company, ex.Message));
+
+                MessageLogger.info(string.Format("Stack trace: {0}", ex.StackTrace.ToString()));
+
                 return (List<IntershopWebService.ProductPrice>)null;
             }
             finally
@@ -818,8 +844,7 @@ namespace IntershopWebService
         private Axapta axLogon(string company)
         {
             Axapta axapta = new Axapta();
-            NetworkCredential networkCredential = new NetworkCredential("xxxxxxxxx", "xxxxxxxxx", "BCE.Local");
-            axapta.LogonAs("xxxxxxxxxxx", "xxxxxxxx", networkCredential, company, (string)null, (string)null, (string)null);
+            axapta.LogonAs("sa_axproxy", "BCE.Local", null, company, (string)null, (string)null, (string)null);
             return axapta;
         }
 
